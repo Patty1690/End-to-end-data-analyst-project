@@ -1,1 +1,258 @@
+# 📈 Stock Market Analysis — End-to-End Data Analytics Project
 
+![Python](https://img.shields.io/badge/Python-3.x-blue?style=flat-square&logo=python)
+![SQL](https://img.shields.io/badge/SQL-MS%20SQL%20Server-CC2927?style=flat-square&logo=microsoftsqlserver)
+![PowerBI](https://img.shields.io/badge/Power%20BI-Dashboard-F2C811?style=flat-square&logo=powerbi)
+![Status](https://img.shields.io/badge/Status-Completed-brightgreen?style=flat-square)
+![Domain](https://img.shields.io/badge/Domain-Finance%20%26%20Stock%20Market-0D1B2A?style=flat-square)
+
+> A complete end-to-end data analytics project analyzing the stock market performance of **HDFC**, **Infosys**, and **Reliance** across 12 months — from raw data cleaning to an interactive Power BI dashboard and business strategy presentation.
+
+---
+
+## 🗂️ Table of Contents
+
+- [Project Overview](#-project-overview)
+- [Tech Stack](#-tech-stack)
+- [Project Structure](#-project-structure)
+- [Data Pipeline](#-data-pipeline)
+- [SQL Analysis](#-sql-analysis--10-business-questions)
+- [Power BI Dashboard](#-power-bi-dashboard)
+- [Key Insights](#-key-insights)
+- [Business Strategy](#-business-strategy)
+- [KPIs at a Glance](#-kpis-at-a-glance)
+- [Future Roadmap](#-future-roadmap)
+- [How to Run](#-how-to-run)
+- [Author](#-author)
+
+---
+
+## 📌 Project Overview
+
+This project follows a real-world **data analytics pipeline** to extract actionable investment insights from stock market data:
+
+| Stage | Tool | Task |
+|-------|------|------|
+| 1 | Python (Pandas, NumPy) | Data cleaning & feature engineering |
+| 2 | SQL (MS SQL Server) | Business analysis — 10 queries |
+| 3 | Power BI + DAX | Interactive dashboard & KPIs |
+| 4 | PowerPoint | Business strategy presentation |
+
+**Stocks Analyzed:** HDFC · Infosys · Reliance  
+**Time Period:** January – December (12 months)  
+**Total Trading Volume:** 233 Million units  
+
+---
+
+## 🛠️ Tech Stack
+
+```
+Python        → Pandas, NumPy, Jupyter Notebook
+SQL           → MS SQL Server (10+ analytical queries, CTEs, STDEV)
+Power BI      → Interactive dashboard, dynamic filters
+DAX           → Calculated measures & KPI logic
+PowerPoint    → Business strategy deck (11 slides)
+```
+
+---
+
+## 📁 Project Structure
+
+```
+stock-market-analysis/
+│
+├── 📓 Data_Cleaning.ipynb          # Python data cleaning notebook
+├── 🗄️  SQLQuery1.sql               # 10 SQL business analysis queries
+├── 📊 Stock_Market.pbix            # Power BI dashboard file
+├── 📑 Stock_Market_Report.docx     # Full project report (Word)
+├── 📽️  Business_Strategy.pptx      # 11-slide business strategy deck
+└── 📄 README.md
+```
+
+---
+
+## 🔄 Data Pipeline
+
+```
+Raw CSV Data
+     │
+     ▼
+┌─────────────────────────┐
+│   Python (Jupyter)      │
+│  • Handle null values   │
+│  • Format date columns  │
+│  • Engineer daily_return│
+│  • Remove duplicates    │
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│   MS SQL Server         │
+│  • 10 business queries  │
+│  • Aggregations & STDEV │
+│  • CTE for total return │
+│  • Seasonal analysis    │
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│   Power BI + DAX        │
+│  • 6 KPI metric cards   │
+│  • Bar, donut & line    │
+│  • Dynamic filters      │
+│  • Insight card         │
+└─────────────────────────┘
+```
+
+---
+
+## 🗄️ SQL Analysis — 10 Business Questions
+
+| # | Business Question | SQL Technique |
+|---|-------------------|---------------|
+| 01 | Average daily return per stock | `AVG(daily_return) GROUP BY stock_name` |
+| 02 | Most volatile stock | `STDEV(daily_return) GROUP BY stock_name` |
+| 03 | Total return per stock | `SUM(daily_return) ORDER BY Total_Return DESC` |
+| 04 | Highest average return month | `TOP 1 + ORDER BY highest_avg_return DESC` |
+| 05 | Yearly average price trend | `AVG(close) GROUP BY year` |
+| 06 | Stock with highest trading volume | `MAX(volume) GROUP BY stock_name` |
+| 07 | Top 5 worst return days | `TOP 5 ORDER BY daily_return ASC` |
+| 08 | Stock performance comparison | `AVG + STDEV GROUP BY stock_name` |
+| 09 | Seasonal return trends | `SUM(daily_return) GROUP BY month` |
+| 10 | Best stock for long-term (CTE) | `CTE: Initial vs Current Price → Total Return %` |
+
+### Sample Query — Long-Term Investment Analysis (CTE)
+
+```sql
+WITH StockBounds AS (
+    SELECT stock_name,
+           MIN(date) AS start_date,
+           MAX(date) AS end_date
+    FROM stock
+    GROUP BY stock_name
+)
+SELECT sb.stock_name,
+       s_start.[close]  AS Initial_Price,
+       s_end.[close]    AS Current_Price,
+       ((s_end.[close] - s_start.[close]) / s_start.[close]) * 100 AS Total_Return_Percent
+FROM StockBounds sb
+JOIN stock s_start ON sb.stock_name = s_start.stock_name AND sb.start_date = s_start.date
+JOIN stock s_end   ON sb.stock_name = s_end.stock_name   AND sb.end_date   = s_end.date;
+```
+
+---
+
+## 📊 Power BI Dashboard
+
+The interactive dashboard includes:
+
+- **KPI Cards** — Avg Closing Price, Daily Return, Total Volume, Max Drawdown, Best/Worst Stock
+- **Avg Return by Stock** — Horizontal bar chart comparing returns
+- **Volatility by Stock** — Bar chart + donut distribution
+- **Monthly Avg Return** — Bar chart showing return by month
+- **Return Contribution** — Donut chart (HDFC = 100%)
+- **Total Volume by Stock** — Volume distribution donut
+- **Monthly Volume Trend** — Line chart across Jan–Dec for all 3 stocks
+- **Insight Card** — Executive summary of top 2 findings
+- **Filters** — Stock Name & Month slicers for dynamic exploration
+
+### DAX Measures Used
+
+```dax
+Avg Daily Return    = AVERAGE(stock[daily_return])
+Total Volume        = SUM(stock[volume])
+Max Drawdown        = MIN(stock[daily_return])
+Volatility          = STDEVX.P(stock, stock[daily_return])
+Return Contribution = DIVIDE([Stock Return], [Total Return], 0)
+```
+
+---
+
+## 💡 Key Insights
+
+### 1 — HDFC is the best stock for long-term investment
+> Only stock with a **positive avg daily return (+0.0003)** and **100% return contribution** to the portfolio. Consistent performance across all 12 months makes it the most reliable long-term hold.
+
+### 2 — Reliance is the worst performer
+> Avg daily return of **-0.0004** drags the overall portfolio return to **-0.0051%**. Worst across return, contribution, and risk-adjusted performance metrics.
+
+### 3 — May–June is the peak trading window
+> All 3 stocks spike to **~8M volume** in months 5–6, up from a **~6M baseline**. This surge is consistent across all stocks — likely driven by macro/index-level events — making it the optimal period for high-liquidity execution.
+
+### 4 — Volatility is macro-driven
+> HDFC and Infosys share identical volatility (**0.011**) and Reliance sits at **0.010** — a narrow spread indicating broad market-driven swings rather than stock-specific events.
+
+---
+
+## 📐 Business Strategy
+
+| Strategy | Recommendation |
+|----------|---------------|
+| **Long-Term Investment** | Overweight HDFC — sole return driver with consistent positive returns |
+| **Trading Timing** | Execute high-volume trades in May–June for best liquidity |
+| **Portfolio Allocation** | Reduce Reliance exposure; hold Infosys as a neutral low-risk position |
+| **Risk Management** | Set stop-loss at max drawdown level of -0.03 |
+
+---
+
+## 📊 KPIs at a Glance
+
+| KPI | Value |
+|-----|-------|
+| Average Closing Price | 1.00K |
+| Avg Daily Return | -0.0051069% |
+| Total Trading Volume | 233M |
+| Max Drawdown | -0.03 |
+| Best Stock | HDFC |
+| Worst Stock | Reliance |
+| Peak Trading Months | May – June |
+
+---
+
+## 🚀 Future Roadmap
+
+- [ ] **Phase 1** — Connect live stock data via Yahoo Finance / Alpha Vantage API
+- [ ] **Phase 2** — Build LSTM / Linear Regression price forecasting model
+- [ ] **Phase 3** — Expand to 10+ stocks with NIFTY 50 benchmark comparison
+- [ ] **Phase 4** — Automate monthly PDF reports with email digest alerts
+
+---
+
+## ▶️ How to Run
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/your-username/stock-market-analysis.git
+cd stock-market-analysis
+```
+
+### 2. Run the Python notebook
+```bash
+pip install pandas numpy jupyter
+jupyter notebook Data_Cleaning.ipynb
+```
+
+### 3. Run SQL queries
+- Open `SQLQuery1.sql` in **MS SQL Server Management Studio**
+- Create a database named `stock`
+- Import the cleaned dataset
+- Execute queries one by one or all at once
+
+### 4. Open the Power BI dashboard
+- Open `Stock_Market.pbix` in **Power BI Desktop**
+- Refresh the data source if prompted
+- Use the **Stock Name** and **Month** filters to explore
+
+---
+
+## 👤 Author
+
+**Prateek Bag**  
+Data Analyst · Python · SQL · Power BI · DAX
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0077B5?style=flat-square&logo=linkedin)](https://linkedin.com/in/your-profile)
+[![Naukri](https://img.shields.io/badge/Naukri-Profile-FF6B35?style=flat-square)](https://naukri.com/your-profile)
+
+---
+
+> ⭐ If you found this project useful, please give it a star — it helps others discover it!
